@@ -3,9 +3,19 @@
   "xml_files_parsed": 9,
   "local_imports": "checked",
   "workflow_yaml": "parsed",
-  "flutter_analyze": "NOT RUN",
-  "flutter_test": "NOT RUN",
-  "apk_build": "BLOCKED",
+  "flutter_analyze": "PASSED (no issues)",
+  "flutter_test": "PASSED (6 tests)",
+  "apk_build": "PASSED",
   "device_test": "NOT RUN",
-  "errors": []
+  "errors": [],
+  "built_commit": "4d91b5292202490885cc1c494855692a8238a90d",
+  "build_url": "https://github.com/pala0071/gorselara/actions/runs/44140286230",
+  "apk_sha256": "83d27170de6d058f26d9b4ce3640237e5d1dffd418601561f5af79b5ff533560",
+  "live_sources": {
+    "wikimedia": "HTTP 200, 3 results",
+    "openverse": "HTTP 403 in development environment",
+    "keyed_sources": "NOT RUN"
+  },
+  "apk_manifest": "verified com.gorselara.app 1.0.0, minSdk 23, targetSdk 35",
+  "apk_integrity": "ZIP CRC and SHA-256 verified"
 }

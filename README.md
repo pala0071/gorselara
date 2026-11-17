@@ -4,13 +4,18 @@ Flutter / Dart Android görsel arama projesi. Paket: `com.gorselara.app`.
 
 ## Teslim ve doğrulama durumu
 
-Kaynak kodu, Android yapılandırması, GitHub Actions iş akışı ve testler bu pakettedir.
-Bu ortamda Flutter kurulumu otomatik güvenlik denetimi tarafından durduruldu: kuruluma
-ait işlem bulut instance-metadata adresine HTTP isteği tetikledi. İşlem yeniden denenmedi.
-Dolayısıyla APK üretilmedi; `flutter analyze`, `flutter test` ve Android cihaz testi
-çalıştırılmadı. Bu paket test edilmiş bir üretim sürümü olarak sunulmamaktadır.
-Dart dosyaları bağımsız bir sözdizimi ayrıştırıcısıyla kontrol edildi. Yerel importlar,
-Android XML ve iş akışı YAML yapısı ayrıca denetlendi; bunlar derlemenin yerini tutmaz.
+Release APK, GitHub Actions üzerinde başarıyla derlendi. Flutter analizinde hiçbir sorun yok. Altı otomatik testin tamamı başarılı.
+Fiziksel Android cihaz veya emülatör testi yapılmadı. Anahtarlı kaynaklar kullanıcı
+anahtarları olmadan canlı olarak doğrulanmadı. Wikimedia canlı arama isteği sonuç verdi;
+Openverse bu geliştirme ortamındaki denemede HTTP 403 döndürdü.
+
+- Derlenen kaynak commit: `4d91b5292202490885cc1c494855692a8238a90d`
+- Başarılı derleme: https://github.com/pala0071/gorselara/actions/runs/44140286230
+- APK boyutu: 58.121.779 bayt
+- APK SHA-256: `83d27170de6d058f26d9b4ce3640237e5d1dffd418601561f5af79b5ff533560`
+- İmza: kişisel deneme için debug anahtarıyla imzalanmış release derleme.
+
+Bu depodaki pubspec.lock, başarılı derlemede çözülmüş bağımlılıkları sabitler.
 
 ## Mimari
 
