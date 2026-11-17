@@ -1,1 +1,19 @@
-{"version": "2.0.0+3", "device_test": "not_run", "ci": "pending", "implementation": "Embedded Google image search restricted to blogspot.com, no external browser"}
+{
+  "version": "2.0.0+3",
+  "implementation": "Embedded Google image search restricted to blogspot.com; no external browser",
+  "device_test": "not_run",
+  "analyze": "passed; one non-fatal curly-braces style info",
+  "tests": {
+    "passed": 4
+  },
+  "build": {
+    "status": "success",
+    "run_url": "https://github.com/pala0071/gorselara/actions/runs/44155204355",
+    "source_commit": "d29c77bd35f2d2b84834562300895b6f4a7ce5ed"
+  },
+  "apk": {
+    "bytes": 50470606,
+    "sha256": "247d50d2bd8c69f7672029a729fc5e7e363e6ab7a351ee6432a28c164e04cc6a",
+    "integrity": "verified"
+  }
+}
