@@ -11,7 +11,7 @@ val hasReleaseSigning = listOf(releaseStorePath, releaseStorePassword, releaseKe
 android {
     namespace = "com.gorselara.app"
     compileSdk = 35
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17

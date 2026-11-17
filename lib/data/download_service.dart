@@ -33,7 +33,9 @@ class DownloadService {
       if (bytes.length >= 8 && bytes[0] == 137 && bytes[1] == 80 && bytes[2] == 78 && bytes[3] == 71) ext = 'png';
       if (bytes.length >= 6 && String.fromCharCodes(bytes.take(6)).startsWith('GIF8')) ext = 'gif';
       if (bytes.length >= 12 && String.fromCharCodes(bytes.take(4)) == 'RIFF' &&
-          String.fromCharCodes(bytes.sublist(8, 12)) == 'WEBP') ext = 'webp';
+          String.fromCharCodes(bytes.sublist(8, 12)) == 'WEBP') {
+        ext = 'webp';
+      }
       if (ext == null) throw const AppException(FailureKind.invalid);
       return await file.rename(file.path.replaceAll('.part', '.$ext'));
     } catch (e) {
