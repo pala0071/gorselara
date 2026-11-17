@@ -1,0 +1,125 @@
+name: Build GorselAra APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'GorselAra-Source.zip'
+      - 'lib/**'
+      - 'android/**'
+      - 'test/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'analysis_options.yaml'
+      - '.github/workflows/build.yml'
+permissions:
+  contents: read
+concurrency:
+  group: gorselara-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CI: "true"
+      FLUTTER_SUPPRESS_ANALYTICS: "true"
+      DART_SUPPRESS_ANALYTICS: "true"
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract optional phone-uploaded source bundle
+        shell: bash
+        run: |
+          if [ -f GorselAra-Source.zip ]; then
+            unzip -q -o GorselAra-Source.zip
+          fi
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Block cloud metadata access
+        shell: bash
+        run: |
+          sudo iptables -I OUTPUT -d 169.254.169.254/32 -j REJECT
+          sudo ip6tables -I OUTPUT -d fd00:ec2::254/128 -j REJECT
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.8'
+          channel: stable
+          cache: true
+      - name: Create scaffold and copy source
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT_DIR="$RUNNER_TEMP/gorselara_project"
+          flutter create --platforms=android --org com.gorselara --project-name gorselara --android-language kotlin --no-pub "$PROJECT_DIR"
+          rm -rf "$PROJECT_DIR/lib" "$PROJECT_DIR/test"
+          cp pubspec.yaml analysis_options.yaml "$PROJECT_DIR/"
+          cp -a lib test "$PROJECT_DIR/"
+          rsync -a --exclude=local.properties --exclude=.gradle android/ "$PROJECT_DIR/android/"
+          if [ -f pubspec.lock ]; then cp pubspec.lock "$PROJECT_DIR/"; fi
+          printf '%s\n' "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+      - name: Configure Gradle wrapper
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          p = Path(os.environ['PROJECT_DIR']) / 'android/gradle/wrapper/gradle-wrapper.properties'
+          lines = p.read_text().splitlines()
+          url = 'distributionUrl=https\\://services.gradle.org/distributions/gradle-8.10.2-all.zip'
+          p.write_text('\n'.join(url if s.startswith('distributionUrl=') else s for s in lines) + '\n')
+          PY
+      - name: Optional release signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -n "${ANDROID_KEYSTORE_BASE64:-}" ]; then
+            : "${ANDROID_KEYSTORE_PASSWORD:?Missing password}"
+            : "${ANDROID_KEY_ALIAS:?Missing alias}"
+            : "${ANDROID_KEY_PASSWORD:?Missing key password}"
+            KEYSTORE_PATH="$RUNNER_TEMP/gorselara-release.jks"
+            printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE_PATH"
+            chmod 600 "$KEYSTORE_PATH"
+            printf '%s\n' "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH" >> "$GITHUB_ENV"
+          else
+            echo '::notice::Debug signing is used for this personal-test release APK.'
+          fi
+      - name: Resolve dependencies
+        run: cd "$PROJECT_DIR" && flutter pub get
+      - name: Analyze
+        run: cd "$PROJECT_DIR" && flutter analyze --no-fatal-infos
+      - name: Test
+        run: cd "$PROJECT_DIR" && flutter test
+      - name: Build APK
+        run: cd "$PROJECT_DIR" && flutter build apk --release
+      - name: Prepare artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          cp "$PROJECT_DIR/build/app/outputs/flutter-apk/app-release.apk" artifacts/GorselAra.apk
+          cp "$PROJECT_DIR/pubspec.lock" artifacts/pubspec.lock
+          cd artifacts
+          sha256sum GorselAra.apk > GorselAra.apk.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GorselAra-APK
+          path: artifacts/GorselAra.apk
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GorselAra-Build-Metadata
+          path: |
+            artifacts/pubspec.lock
+            artifacts/GorselAra.apk.sha256
+          if-no-files-found: error
+          retention-days: 30
+      - name: Remove temporary signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/gorselara-release.jks"

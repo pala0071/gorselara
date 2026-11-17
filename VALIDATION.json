@@ -1,0 +1,11 @@
+{
+  "dart_files_syntax_checked": 42,
+  "xml_files_parsed": 9,
+  "local_imports": "checked",
+  "workflow_yaml": "parsed",
+  "flutter_analyze": "NOT RUN",
+  "flutter_test": "NOT RUN",
+  "apk_build": "BLOCKED",
+  "device_test": "NOT RUN",
+  "errors": []
+}

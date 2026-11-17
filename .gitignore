@@ -1,7 +1,14 @@
 .dart_tool/
 build/
-android/local.properties
+coverage/
+.idea/
+*.iml
+.flutter-plugins
+.flutter-plugins-dependencies
 android/.gradle/
+android/local.properties
+android/key.properties
 *.jks
 *.keystore
 .env
+.env.*
