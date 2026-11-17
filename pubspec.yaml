@@ -1,7 +1,7 @@
 name: gorselara
 description: Çok kaynaklı Android görsel arama uygulaması.
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.1+2
 environment:
   sdk: '>=3.8.0 <4.0.0'
 dependencies:

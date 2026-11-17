@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../providers.dart';
 
 class SearchBox extends ConsumerStatefulWidget {
@@ -24,6 +25,28 @@ class _SearchBoxState extends ConsumerState<SearchBox> {
     focus.unfocus();
     setState(() => suggestions = false);
     ref.read(searchProvider.notifier).search(q);
+  }
+  Future<void> openPinterest() async {
+    final s = ref.read(stringsProvider);
+    final query = controller.text.trim();
+    if (query.isEmpty) {
+      focus.requestFocus();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+        s.t('Önce aramak istediğin kelimeyi yaz.', 'Enter a search term first.'))));
+      return;
+    }
+    focus.unfocus();
+    final uri = Uri.https('www.pinterest.com', '/search/pins/', {'q': query});
+    try {
+      final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!opened) throw StateError('Unable to open Pinterest');
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+        s.t('Pinterest açılamadı. Tarayıcını kontrol edip tekrar dene.',
+          'Could not open Pinterest. Check your browser and try again.')),
+        action: SnackBarAction(label: s.t('Yeniden dene', 'Retry'), onPressed: openPinterest)));
+    }
   }
   Future<void> dictate() async {
     final s = ref.read(stringsProvider);
@@ -66,6 +89,14 @@ class _SearchBoxState extends ConsumerState<SearchBox> {
           suffixIcon: IconButton(tooltip: s.t('Sesle ara', 'Voice search'), onPressed: dictate,
             icon: Icon(listening ? Icons.mic : Icons.mic_none, color: listening ? Colors.red : null)),
           filled: true, border: OutlineInputBorder(borderRadius: BorderRadius.circular(22), borderSide: BorderSide.none))),
+      const SizedBox(height: 8),
+      SizedBox(width: double.infinity, child: OutlinedButton.icon(
+        onPressed: openPinterest,
+        icon: const Icon(Icons.open_in_new),
+        label: Text(s.t('Pinterest’te ara', 'Search on Pinterest')))),
+      Text(s.t('Anahtar gerekmez · Pinterest uygulamasında veya tarayıcıda açılır.',
+        'No API key · Opens in Pinterest or your browser.'),
+        textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodySmall),
       if (suggestions && history.isNotEmpty) Card(child: Column(children: history.map((q) => ListTile(
         dense: true, leading: const Icon(Icons.history), title: Text(q), onTap: () => submit(q))).toList())),
     ]);

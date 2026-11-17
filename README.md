@@ -1,3 +1,9 @@
+## 1.0.1 — Pinterest arama geçişi
+
+Arama kutusuna bir kelime yazıp **Pinterest’te ara** düğmesine basın. API anahtarı gerektirmez; Pinterest uygulamasında veya tarayıcıda aramayı açar. Sonuçlar Pinterest’te gösterilir; GörselAra filtreleri, galeri indirmesi ve birleşik ızgarası bu dış aramaya uygulanmaz. Pinterest kendi oturum açma ekranını gösterebilir.
+
+Bu kişisel test APK’sı önceki APK’dan farklı test anahtarıyla imzalanabilir. Android güncellemeyi reddederse eski uygulamayı kaldırmak gerekir; kaldırma yerel favorileri, geçmişi ve ayarları siler. Galeriye kaydedilmiş dosyalar kalır.
+
 # GörselAra
 
 Flutter / Dart Android görsel arama projesi. Paket: `com.gorselara.app`.
